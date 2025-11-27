@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
@@ -12,17 +12,20 @@
 <body>
   <div class="app-shell">
     <header class="glass header">
-      <div class="brand">AI Facial Insights</div>
+      <div class="brand"> AI Facial Insights</div>
       <div class="api-config">
-        <label for="apiUrl">API</label>
-        <input id="apiUrl" type="text" placeholder="http://localhost:8001" />
+        <label for="apiUrl">Backend API URL</label>
+        <input id="apiUrl" type="text" placeholder="Enter API URL (e.g., http://localhost:8001)" />
         <button id="saveApi" class="btn">Save</button>
       </div>
     </header>
 
     <main class="content-grid">
       <section class="glass panel upload">
-        <h2>Upload Photo</h2>
+        <h2> Upload Photo</h2>
+        <div class="info-banner">
+           <strong>Setup Required:</strong> Enter your backend API URL above, then click Save before analyzing images.
+        </div>
         <form id="uploadForm" class="upload-form">
           <input type="file" id="imageInput" accept="image/*" />
           <button type="submit" class="btn primary">Analyze</button>
@@ -34,7 +37,7 @@
       </section>
 
       <section class="glass panel results">
-        <h2>Results</h2>
+        <h2> Results</h2>
         <div class="cards">
           <div class="card"><div class="label">Age</div><div id="ageVal" class="value">—</div><div id="ageBand" class="subvalue">—</div></div>
           <div class="card"><div class="label">Gender</div><div id="genderVal" class="value">—</div></div>
@@ -43,27 +46,23 @@
         </div>
 
         <div class="charts">
-          <div class="chart glass"><h3>Emotion Breakdown</h3><pre id="emotionJson" class="json"></pre></div>
-          <div class="chart glass"><h3>Race Breakdown</h3><pre id="raceJson" class="json"></pre></div>
+          <div class="chart glass"><h3>Emotion Breakdown</h3><pre id="emotionJson" class="json">Upload an image to see results</pre></div>
+          <div class="chart glass"><h3>Race Breakdown</h3><pre id="raceJson" class="json">Upload an image to see results</pre></div>
         </div>
       </section>
     </main>
 
     <footer class="glass footer">
-      <div>Tip: First analyze may take ~10-30s while models download.</div>
-      <div>Frontend is GH Pages-ready. Configure API via the input above.</div>
+      <div> <strong>Local testing:</strong> Run backend with <code>python -m uvicorn backend.main_deepface:app --host 0.0.0.0 --port 8001</code>, then use API: <code>http://localhost:8001</code></div>
+      <div> <strong>Production:</strong> Deploy backend to Render/Railway/Azure and enter the URL above.</div>
     </footer>
   </div>
 
   <div id="loader" class="loader hidden">
     <div class="spinner"></div>
-    <div>Analyzing with DeepFace models…</div>
+    <div>Analyzing with DeepFace models</div>
   </div>
 
   <script src="script.js"></script>
 </body>
-</html>
-
-    <script src="script.js"></script>
-  </body>
 </html>
