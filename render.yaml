@@ -9,7 +9,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: PYTHONUNBUFFERED
-        value: 1
+        value: "1"
       - key: TF_CPP_MIN_LOG_LEVEL
-        value: 2
+        value: "2"
     healthCheckPath: /
