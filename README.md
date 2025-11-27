@@ -79,13 +79,29 @@ The frontend is auto-deployed via GitHub Actions on every push to main.
 3. Workflow: .github/workflows/deploy-pages.yml (already configured)
 4. Site URL: https://<username>.github.io/Facial_predictor/
 
-**Backend hosting options**:
-- **Render.com**: Free tier, deploy ackend/main_deepface.py as web service
-- **Railway.app**: Auto-deploy from GitHub with Dockerfile
+## 🚀 Deploy Backend (Work from Any Device!)
+
+**For production use, deploy the backend to Render.com (free tier):**
+
+📖 **See [DEPLOY_GUIDE.md](DEPLOY_GUIDE.md) for detailed instructions**
+
+**Quick steps**:
+1. Sign up at https://render.com (free)
+2. Create new Web Service → Connect your GitHub repo
+3. Configure:
+   - Build: `pip install -r requirements.txt`
+   - Start: `uvicorn backend.main_deepface:app --host 0.0.0.0 --port $PORT`
+   - Plan: **Free**
+4. Get your URL: `https://your-app.onrender.com`
+5. Update frontend: Enter URL in GitHub Pages top-right corner
+
+**Alternative hosting options**:
+- **Railway.app**: Auto-deploy from GitHub with $5/month free credit
 - **Azure App Service**: Python 3.11, Linux container
 - **Google Cloud Run**: Serverless, pay-per-request
+- **AWS Elastic Beanstalk**: Python platform with free tier
 
-Update the frontend API URL to point to your deployed backend.
+Once deployed, your app works from **any device** with internet - no localhost needed!
 
 ## Project Structure 
 

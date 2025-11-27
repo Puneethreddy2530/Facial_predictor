@@ -5,7 +5,7 @@ import os
 
 from backend.core_deepface import analyze_image
 
-app = FastAPI()
+app = FastAPI(title="AI Facial Insights API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,6 +14,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/")
+async def root():
+    """Health check endpoint for Render.com"""
+    return {"status": "healthy", "service": "AI Facial Insights API", "version": "1.0.0"}
 
 
 @app.post("/predict")
