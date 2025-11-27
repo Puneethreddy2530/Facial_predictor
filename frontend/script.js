@@ -40,11 +40,12 @@ uploadForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  const base = (apiUrlInput ? apiUrlInput.value : (savedApi || defaultApi)).trim();
+  const base = (apiUrlInput ? apiUrlInput.value : (savedApi || defaultApi)).trim() || defaultApi;
   
   if (!base) {
-    statusEl && (statusEl.textContent = '⚠️ Backend API URL not configured. Using default: https://facial-predictor-api.onrender.com');
-    statusEl.style.color = '#f59e0b';
+    statusEl && (statusEl.textContent = '⚠️ Backend API URL not configured.');
+    statusEl.style.color = '#ef4444';
+    return;
   }
 
   const fd = new FormData();
@@ -66,17 +67,27 @@ uploadForm.addEventListener('submit', async (e) => {
     }
 
     const data = await res.json();
+    
+    // Check if API returned an error message
+    if (data.error) {
+      statusEl && (statusEl.textContent = '⚠️ API Error: ' + data.error);
+      statusEl.style.color = '#f59e0b';
+      console.error('API Error:', data.error);
+    }
+    
+    // Render results even if there's an error (might have partial data)
     renderResults(data);
   } catch (err) {
     console.error('Fetch error:', err);
     if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-      statusEl && (statusEl.textContent = ' Cannot connect to backend. Make sure: 1) API URL is correct, 2) Backend is running, 3) CORS is enabled on backend.');
+      statusEl && (statusEl.textContent = '❌ Cannot connect to backend. The free tier may be sleeping (takes 30-60s to wake up). Please wait and try again.');
     } else {
-      statusEl && (statusEl.textContent = ' Error: ' + err.message);
+      statusEl && (statusEl.textContent = '❌ Error: ' + err.message);
     }
     statusEl.style.color = '#ef4444';
+  } finally {
+    loader && loader.classList.add('hidden');
   }
-  loader && loader.classList.add('hidden');
 });
 
 function renderResults(data) {
