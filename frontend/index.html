@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Facial Insights</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="glass header">
+      <div class="brand">AI Facial Insights</div>
+      <div class="api-config">
+        <label for="apiUrl">API</label>
+        <input id="apiUrl" type="text" placeholder="http://localhost:8001" />
+        <button id="saveApi" class="btn">Save</button>
+      </div>
+    </header>
+
+    <main class="content-grid">
+      <section class="glass panel upload">
+        <h2>Upload Photo</h2>
+        <form id="uploadForm" class="upload-form">
+          <input type="file" id="imageInput" accept="image/*" />
+          <button type="submit" class="btn primary">Analyze</button>
+        </form>
+        <div class="preview-wrap">
+          <img id="preview" alt="preview" />
+        </div>
+        <div id="status" class="status"></div>
+      </section>
+
+      <section class="glass panel results">
+        <h2>Results</h2>
+        <div class="cards">
+          <div class="card"><div class="label">Age</div><div id="ageVal" class="value">—</div><div id="ageBand" class="subvalue">—</div></div>
+          <div class="card"><div class="label">Gender</div><div id="genderVal" class="value">—</div></div>
+          <div class="card"><div class="label">Dominant Emotion</div><div id="emotionVal" class="value">—</div></div>
+          <div class="card"><div class="label">Dominant Race</div><div id="raceVal" class="value">—</div></div>
+        </div>
+
+        <div class="charts">
+          <div class="chart glass"><h3>Emotion Breakdown</h3><pre id="emotionJson" class="json"></pre></div>
+          <div class="chart glass"><h3>Race Breakdown</h3><pre id="raceJson" class="json"></pre></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="glass footer">
+      <div>Tip: First analyze may take ~10-30s while models download.</div>
+      <div>Frontend is GH Pages-ready. Configure API via the input above.</div>
+    </footer>
+  </div>
+
+  <div id="loader" class="loader hidden">
+    <div class="spinner"></div>
+    <div>Analyzing with DeepFace models…</div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+    <script src="script.js"></script>
+  </body>
+</html>

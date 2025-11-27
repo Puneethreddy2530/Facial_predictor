@@ -1,0 +1,51 @@
+﻿# Virtual environments
+.venv/
+.venv311/
+env/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Datasets & models (large files)
+datasets/
+models/
+*.pkl
+*.h5
+*.pb
+*.onnx
+
+# DeepFace cache
+.deepface/
+
+# Secrets
+.kaggle/
+*.env
+*.key
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/

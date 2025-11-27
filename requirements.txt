@@ -1,0 +1,28 @@
+# Backend API
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Image processing
+pillow
+numpy
+opencv-python-headless
+
+# ML frameworks (optional - for real predictions)
+deepface
+tensorflow>=2.13.0
+scikit-learn
+
+# Data collection
+requests
+gdown
+kaggle
+tqdm
+
+# Visualization
+matplotlib
+seaborn
+
+# Testing
+httpx
+pytest
