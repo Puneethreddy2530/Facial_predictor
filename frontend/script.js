@@ -53,33 +53,52 @@ uploadForm.addEventListener('submit', async (e) => {
 
   statusEl && (statusEl.textContent = '');
   loader && loader.classList.remove('hidden');
+  const loaderText = document.querySelector('#loader div:last-child');
+  let startTs = Date.now();
+  const updateLoader = (msg) => { if (loaderText) loaderText.textContent = msg; };
+  updateLoader('Warming up backend (free tier) …');
 
   try {
     const apiUrl = base.replace(/\/$/, '') + '/predict';
-    
-    const res = await fetch(apiUrl, {
-      method: 'POST',
-      body: fd,
-    });
+    const controller = new AbortController();
+    const timeoutMs = 90000; // 90s to survive cold starts
+    const timer = setTimeout(() => controller.abort('Request timed out after 90s'), timeoutMs);
 
-    if (!res.ok) {
-      throw new Error(HTTP : );
+    const doRequest = async () => {
+      const res = await fetch(apiUrl, { method: 'POST', body: fd, signal: controller.signal });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`HTTP ${res.status} ${res.statusText}: ${txt.slice(0,200)}`);
+      }
+      return res.json();
+    };
+
+    let data;
+    try {
+      updateLoader('Analyzing image …');
+      data = await doRequest();
+    } catch (err) {
+      // One auto-retry after small backoff (handles wake-ups)
+      updateLoader('Backend waking up… retrying once …');
+      await new Promise(r => setTimeout(r, 2500));
+      data = await doRequest();
+    } finally {
+      clearTimeout(timer);
     }
 
-    const data = await res.json();
-    
-    // Check if API returned an error message
     if (data.error) {
       statusEl && (statusEl.textContent = '⚠️ API Error: ' + data.error);
       statusEl.style.color = '#f59e0b';
       console.error('API Error:', data.error);
     }
-    
-    // Render results even if there's an error (might have partial data)
+
     renderResults(data);
   } catch (err) {
     console.error('Fetch error:', err);
-    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+    const elapsed = ((Date.now() - startTs) / 1000).toFixed(1);
+    if (err.name === 'AbortError' || err.message.includes('timed out')) {
+      statusEl && (statusEl.textContent = `❌ Request timed out after ${elapsed}s. The free tier may be waking up; please try again.`);
+    } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
       statusEl && (statusEl.textContent = '❌ Cannot connect to backend. The free tier may be sleeping (takes 30-60s to wake up). Please wait and try again.');
     } else {
       statusEl && (statusEl.textContent = '❌ Error: ' + err.message);
@@ -87,6 +106,7 @@ uploadForm.addEventListener('submit', async (e) => {
     statusEl.style.color = '#ef4444';
   } finally {
     loader && loader.classList.add('hidden');
+    updateLoader('Analyzing with DeepFace models…');
   }
 });
 

@@ -26,6 +26,21 @@ async def root():
 async def predict(file: UploadFile = File(...)):
     """Accept an uploaded image, run analysis with DeepFace and return predictions."""
     try:
+        # Demo mode: return lightweight mock to ensure public availability
+        if os.getenv("MOCK_PREDICTION", "0") == "1":
+            return JSONResponse(content={
+                "age": 28,
+                "age_band": "Adult",
+                "gender": "Man",
+                "dominant_emotion": "neutral",
+                "emotion": {"neutral": 90.0, "happy": 5.0, "sad": 2.0, "angry": 1.0, "surprise": 1.0, "fear": 0.5, "disgust": 0.5},
+                "dominant_race": "unknown",
+                "race": {},
+                "low_quality": False,
+                "quality_reason": None,
+                "low_confidence": False,
+                "facial_area": None
+            })
         contents = await file.read()
         result = analyze_image(contents, use_mock=False)
 

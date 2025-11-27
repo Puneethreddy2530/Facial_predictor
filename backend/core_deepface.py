@@ -14,6 +14,8 @@ try:
 except Exception:
     cv2 = None
 
+_MODELS_LOADED = False
+
 def analyze_image(image_bytes: bytes, use_mock: bool = False) -> Dict[str, Any]:
     """Analyze an image using DeepFace CNN models.
     
@@ -23,8 +25,13 @@ def analyze_image(image_bytes: bytes, use_mock: bool = False) -> Dict[str, Any]:
         # Lazy import DeepFace (heavy library)
         from deepface import DeepFace
         
-        # Convert bytes to image
+        # Convert bytes to image and downscale to reduce memory (max side 640px)
         img = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+        w, h = img.size
+        max_side = max(w, h)
+        if max_side > 640:
+            scale = 640.0 / max_side
+            img = img.resize((int(w * scale), int(h * scale)), Image.BILINEAR)
         img_array = np.array(img)
 
         # --- Quality checks (blur and face size) ---
@@ -45,7 +52,7 @@ def analyze_image(image_bytes: bytes, use_mock: bool = False) -> Dict[str, Any]:
         try:
             faces = DeepFace.extract_faces(
                 img_array,
-                detector_backend='retinaface',
+                detector_backend='opencv',  # lighter than retinaface
                 enforce_detection=True
             )
             if isinstance(faces, list) and len(faces) > 0:
@@ -76,22 +83,20 @@ def analyze_image(image_bytes: bytes, use_mock: bool = False) -> Dict[str, Any]:
                     (" " if quality["reason"] else "") +
                     "Detected face too small; upload a closer photo.")
         
-        # Analyze with DeepFace (uses pre-trained CNNs)
-        # Prefer RetinaFace detector for better alignment; fallback if missing
+        # Analyze with DeepFace (reduced actions to lower memory footprint)
+        target = largest_face if largest_face is not None else img_array
         try:
-            target = largest_face if largest_face is not None else img_array
             result = DeepFace.analyze(
                 target,
-                actions=['age', 'gender', 'emotion', 'race'],
-                detector_backend='retinaface',
+                actions=['emotion'],
+                detector_backend='opencv',
                 enforce_detection=False,
                 silent=True
             )
         except Exception:
-            target = largest_face if largest_face is not None else img_array
             result = DeepFace.analyze(
                 target,
-                actions=['age', 'gender', 'emotion', 'race'],
+                actions=['emotion'],
                 enforce_detection=False,
                 silent=True
             )
