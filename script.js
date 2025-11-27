@@ -23,11 +23,13 @@ imageInput.addEventListener('change', () => {
 // Load API URL from query (?api=) or localStorage
 const urlParam = new URLSearchParams(location.search).get('api');
 const savedApi = localStorage.getItem('apiUrl');
-const defaultApi = 'http://localhost:8001';
+const defaultApi = '';
 apiUrlInput && (apiUrlInput.value = urlParam || savedApi || defaultApi);
 saveApiBtn && saveApiBtn.addEventListener('click', () => {
   localStorage.setItem('apiUrl', apiUrlInput.value.trim());
-  statusEl && (statusEl.textContent = 'API saved');
+  statusEl && (statusEl.textContent = ' API URL saved');
+  statusEl.style.color = '#4ade80';
+  setTimeout(() => { statusEl.textContent = ''; }, 2000);
 });
 
 uploadForm.addEventListener('submit', async (e) => {
@@ -38,6 +40,14 @@ uploadForm.addEventListener('submit', async (e) => {
     return;
   }
 
+  const base = (apiUrlInput ? apiUrlInput.value : (savedApi || defaultApi)).trim();
+  
+  if (!base) {
+    statusEl && (statusEl.textContent = ' Please enter a backend API URL in the top-right corner first. Example: http://localhost:8001 (for local) or https://your-backend.com (for deployed)');
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+
   const fd = new FormData();
   fd.append('file', file);
 
@@ -45,7 +55,6 @@ uploadForm.addEventListener('submit', async (e) => {
   loader && loader.classList.remove('hidden');
 
   try {
-    const base = (apiUrlInput ? apiUrlInput.value : (savedApi || defaultApi));
     const apiUrl = base.replace(/\/$/, '') + '/predict';
     
     const res = await fetch(apiUrl, {
@@ -61,7 +70,12 @@ uploadForm.addEventListener('submit', async (e) => {
     renderResults(data);
   } catch (err) {
     console.error('Fetch error:', err);
-    statusEl && (statusEl.textContent = 'Error: ' + err.message + ' — verify API URL and backend is running.');
+    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+      statusEl && (statusEl.textContent = ' Cannot connect to backend. Make sure: 1) API URL is correct, 2) Backend is running, 3) CORS is enabled on backend.');
+    } else {
+      statusEl && (statusEl.textContent = ' Error: ' + err.message);
+    }
+    statusEl.style.color = '#ef4444';
   }
   loader && loader.classList.add('hidden');
 });
@@ -93,6 +107,6 @@ function renderResults(data) {
   }
   if (statusEl) {
     statusEl.textContent = warnings.join(' ');
-    statusEl.style.color = warnings.length > 0 ? '#ffcc00' : '';
+    statusEl.style.color = warnings.length > 0 ? '#ffcc00' : '#4ade80';
   }
 }
