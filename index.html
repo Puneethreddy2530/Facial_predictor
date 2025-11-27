@@ -12,19 +12,19 @@
 <body>
   <div class="app-shell">
     <header class="glass header">
-      <div class="brand"> AI Facial Insights</div>
+      <div class="brand">🎭 AI Facial Insights</div>
       <div class="api-config">
-        <label for="apiUrl">Backend API URL</label>
-        <input id="apiUrl" type="text" placeholder="Enter API URL (e.g., http://localhost:8001)" />
+        <label for="apiUrl">API URL (optional)</label>
+        <input id="apiUrl" type="text" placeholder="Using Render.com (default)" />
         <button id="saveApi" class="btn">Save</button>
       </div>
     </header>
 
     <main class="content-grid">
       <section class="glass panel upload">
-        <h2> Upload Photo</h2>
-        <div class="info-banner">
-           <strong>Setup Required:</strong> Enter your backend API URL above, then click Save before analyzing images.
+        <h2>📸 Upload Photo</h2>
+        <div class="info-banner" style="background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.4); color: #86efac;">
+          ✅ <strong>Ready to use!</strong> Backend is live on Render.com. Just upload a photo and click Analyze.
         </div>
         <form id="uploadForm" class="upload-form">
           <input type="file" id="imageInput" accept="image/*" />

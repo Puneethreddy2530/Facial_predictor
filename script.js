@@ -23,7 +23,7 @@ imageInput.addEventListener('change', () => {
 // Load API URL from query (?api=) or localStorage
 const urlParam = new URLSearchParams(location.search).get('api');
 const savedApi = localStorage.getItem('apiUrl');
-const defaultApi = '';
+const defaultApi = 'https://facial-predictor-api.onrender.com';
 apiUrlInput && (apiUrlInput.value = urlParam || savedApi || defaultApi);
 saveApiBtn && saveApiBtn.addEventListener('click', () => {
   localStorage.setItem('apiUrl', apiUrlInput.value.trim());
@@ -43,9 +43,8 @@ uploadForm.addEventListener('submit', async (e) => {
   const base = (apiUrlInput ? apiUrlInput.value : (savedApi || defaultApi)).trim();
   
   if (!base) {
-    statusEl && (statusEl.textContent = ' Please enter a backend API URL in the top-right corner first. Example: http://localhost:8001 (for local) or https://your-backend.com (for deployed)');
+    statusEl && (statusEl.textContent = '⚠️ Backend API URL not configured. Using default: https://facial-predictor-api.onrender.com');
     statusEl.style.color = '#f59e0b';
-    return;
   }
 
   const fd = new FormData();
