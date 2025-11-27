@@ -1,4 +1,4 @@
-const imageInput = document.getElementById('imageInput');
+﻿const imageInput = document.getElementById('imageInput');
 const preview = document.getElementById('preview');
 const uploadForm = document.getElementById('uploadForm');
 const statusEl = document.getElementById('status');
@@ -54,7 +54,7 @@ uploadForm.addEventListener('submit', async (e) => {
     });
 
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      throw new Error(HTTP : );
     }
 
     const data = await res.json();
@@ -82,4 +82,17 @@ function renderResults(data) {
 
   emotionJson && (emotionJson.textContent = JSON.stringify(data.emotion, null, 2));
   raceJson && (raceJson.textContent = JSON.stringify(data.race, null, 2));
+
+  // Quality and confidence warnings
+  let warnings = [];
+  if (data.low_quality && data.quality_reason) {
+    warnings.push(' ' + data.quality_reason);
+  }
+  if (data.low_confidence) {
+    warnings.push('ℹ Low confidence in emotion/race — results may be uncertain.');
+  }
+  if (statusEl) {
+    statusEl.textContent = warnings.join(' ');
+    statusEl.style.color = warnings.length > 0 ? '#ffcc00' : '';
+  }
 }
