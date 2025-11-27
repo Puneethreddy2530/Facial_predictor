@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>API Test - Facial Predictor</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a2e;
+      color: #eee;
+    }
+    .box {
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    button:hover { opacity: 0.8; }
+    .error { color: #ff6b6b; }
+    .success { color: #51cf66; }
+    .warning { color: #ffd93d; }
+    pre {
+      background: #0f0f0f;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    input[type="file"] {
+      margin: 10px 0;
+      padding: 10px;
+      background: #0f3460;
+      border: 1px solid #4CAF50;
+      border-radius: 8px;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔧 API Test Page</h1>
+  <p>Use this page to test if the backend API is working correctly.</p>
+
+  <div class="box">
+    <h2>1. Health Check</h2>
+    <p>Test if the API is online and responding:</p>
+    <button onclick="testHealth()">Test Health Check</button>
+    <pre id="healthResult">Click button to test...</pre>
+  </div>
+
+  <div class="box">
+    <h2>2. Image Prediction Test</h2>
+    <p>Upload an image to test the /predict endpoint:</p>
+    <input type="file" id="testImage" accept="image/*">
+    <button onclick="testPredict()">Test Prediction</button>
+    <pre id="predictResult">Upload an image and click button to test...</pre>
+  </div>
+
+  <div class="box">
+    <h2>💡 What to expect:</h2>
+    <ul>
+      <li><strong>Health Check</strong>: Should return status "healthy"</li>
+      <li><strong>Prediction</strong>: Should return age, gender, emotion, race data</li>
+      <li><strong>First request</strong>: May take 30-60 seconds (cold start)</li>
+      <li><strong>Error about tf-keras</strong>: Render needs to rebuild (automatic)</li>
+    </ul>
+  </div>
+
+  <script>
+    const API_URL = 'https://facial-predictor-api.onrender.com';
+
+    async function testHealth() {
+      const result = document.getElementById('healthResult');
+      result.innerHTML = '<span class="warning">Testing... (may take 30-60s on first request)</span>';
+      
+      try {
+        const start = Date.now();
+        const response = await fetch(`${API_URL}/`);
+        const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+        const data = await response.json();
+        
+        result.innerHTML = `<span class="success">✅ Success! (${elapsed}s)</span>\n\n${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        result.innerHTML = `<span class="error">❌ Error:</span>\n${error.message}\n\nThe API might be sleeping. Wait 60s and try again.`;
+      }
+    }
+
+    async function testPredict() {
+      const result = document.getElementById('predictResult');
+      const fileInput = document.getElementById('testImage');
+      
+      if (!fileInput.files[0]) {
+        result.innerHTML = '<span class="error">❌ Please select an image first!</span>';
+        return;
+      }
+      
+      result.innerHTML = '<span class="warning">Testing... (may take 30-60s on first request)</span>';
+      
+      try {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        
+        const start = Date.now();
+        const response = await fetch(`${API_URL}/predict`, {
+          method: 'POST',
+          body: formData
+        });
+        const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+        const data = await response.json();
+        
+        if (data.error) {
+          result.innerHTML = `<span class="warning">⚠️ API returned an error (${elapsed}s):</span>\n\n${data.error}\n\n<span class="warning">Full response:</span>\n${JSON.stringify(data, null, 2)}`;
+        } else {
+          result.innerHTML = `<span class="success">✅ Success! (${elapsed}s)</span>\n\n${JSON.stringify(data, null, 2)}`;
+        }
+      } catch (error) {
+        result.innerHTML = `<span class="error">❌ Error:</span>\n${error.message}\n\nThe API might be sleeping. Wait 60s and try again.`;
+      }
+    }
+
+    // Auto-test health on load
+    window.addEventListener('load', () => {
+      setTimeout(testHealth, 1000);
+    });
+  </script>
+</body>
+</html>
