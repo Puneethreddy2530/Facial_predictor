@@ -1,0 +1,4 @@
+Val Loss: 7.4310
+Age MAE: 6.61
+Gender Accuracy: 0.8420
+Race Accuracy: 0.6634

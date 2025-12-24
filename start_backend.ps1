@@ -1,5 +1,5 @@
 # Quick starter - Run backend only
-$env:MOCK_PREDICTION = '1'
+$env:MOCK_PREDICTION = '0'
 $env:PYTHONPATH = '.'
 
 Write-Host "Starting backend on http://localhost:8001..." -ForegroundColor Cyan

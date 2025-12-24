@@ -31,15 +31,39 @@ python data_collection/scrape_faces.py
 - **Option 1**: Sample (LFW) - 170MB, quick start
 - **Option 2**: UTKFace - 23K images with age, gender, race (~500MB)
 - **Option 3**: FER2013 - 35K images with emotions (~300MB, needs Kaggle)
+- **Option 4**: FairFace - 100K balanced faces with age/gender/race (~5GB, Kaggle)
 
 **Manual downloads** (if automated fails):
 - UTKFace: https://susanqq.github.io/UTKFace/
 - FER2013: https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data
+- FairFace: https://www.kaggle.com/datasets/djagatiya/fairface
 - LFW: http://vis-www.cs.umass.edu/lfw/lfw.tgz
 
 ---
 
 ### Step 3: Train Custom Models
+
+**Fast upgrade (recommended): Multitask EfficientNet**
+
+```powershell
+# Train on UTKFace (age/gender/race) + FER2013 (emotion)
+python training/train_multitask.py ^
+    --utkface-dir datasets/utkface_aligned_cropped/UTKFace ^
+    --fer-csv datasets/fer2013.csv ^
+    --epochs 20 --batch-size 32
+```
+
+Produces:
+- `models/multitask_model.keras` – shared backbone with 4 heads
+- `models/multitask_meta.json` – labels + image size
+- `models/multitask_history.json` – training curves
+
+Notes:
+- Uses EfficientNetB0 with data augmentation and early stopping
+- Needs both datasets; set `--limit-utk`/`--limit-fer` for quick smoke tests
+- Backend auto-loads this model when present (`USE_CUSTOM_MODEL=1`, default)
+
+**Legacy CNN (single-task per head)**
 
 ```powershell
 python training/train_model.py
