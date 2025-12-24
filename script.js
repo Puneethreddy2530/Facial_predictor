@@ -5,6 +5,10 @@ const statusEl = document.getElementById('status');
 const loader = document.getElementById('loader');
 const apiUrlInput = document.getElementById('apiUrl');
 const saveApiBtn = document.getElementById('saveApi');
+const startCamBtn = document.getElementById('startCamera');
+const stopCamBtn = document.getElementById('stopCamera');
+const captureBtn = document.getElementById('capturePhoto');
+const videoEl = document.getElementById('cameraStream');
 const ageVal = document.getElementById('ageVal');
 const ageBand = document.getElementById('ageBand');
 const genderVal = document.getElementById('genderVal');
@@ -13,17 +17,22 @@ const raceVal = document.getElementById('raceVal');
 const emotionJson = document.getElementById('emotionJson');
 const raceJson = document.getElementById('raceJson');
 
+let mediaStream = null;
+let lastCaptureUrl = null;
+
 imageInput.addEventListener('change', () => {
   const file = imageInput.files[0];
   if (!file) return;
   const url = URL.createObjectURL(file);
   preview.src = url;
+  lastCaptureUrl = url;
 });
 
 // Load API URL from query (?api=) or localStorage
 const urlParam = new URLSearchParams(location.search).get('api');
 const savedApi = localStorage.getItem('apiUrl');
-const defaultApi = 'https://facial-predictor-api.onrender.com';
+const defaultApi = 'http://127.0.0.1:8001';
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 apiUrlInput && (apiUrlInput.value = urlParam || savedApi || defaultApi);
 saveApiBtn && saveApiBtn.addEventListener('click', () => {
   localStorage.setItem('apiUrl', apiUrlInput.value.trim());
@@ -31,6 +40,68 @@ saveApiBtn && saveApiBtn.addEventListener('click', () => {
   statusEl.style.color = '#4ade80';
   setTimeout(() => { statusEl.textContent = ''; }, 2000);
 });
+
+async function startCamera() {
+  try {
+    if (mediaStream) return;
+    mediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    videoEl.srcObject = mediaStream;
+    videoEl.classList.remove('hidden');
+    await videoEl.play();
+    statusEl && (statusEl.textContent = 'Camera is live');
+    statusEl.style.color = '#4ade80';
+  } catch (err) {
+    console.error('Camera error:', err);
+    statusEl && (statusEl.textContent = '❌ Cannot access camera: ' + err.message);
+    statusEl.style.color = '#ef4444';
+  }
+}
+
+function stopCamera() {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(t => t.stop());
+    mediaStream = null;
+  }
+  videoEl && videoEl.classList.add('hidden');
+}
+
+function setFileFromBlob(blob) {
+  const file = new File([blob], 'capture.jpg', { type: 'image/jpeg' });
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  imageInput.files = dt.files;
+}
+
+async function captureFrame() {
+  if (!mediaStream || !videoEl || videoEl.readyState < 2) {
+    statusEl && (statusEl.textContent = 'Start the camera before capturing');
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+  const w = videoEl.videoWidth || 640;
+  const h = videoEl.videoHeight || 480;
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext('2d').drawImage(videoEl, 0, 0, w, h);
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    setFileFromBlob(blob);
+    const url = URL.createObjectURL(blob);
+    preview.src = url;
+    lastCaptureUrl = url;
+    statusEl && (statusEl.textContent = 'Captured from camera');
+    statusEl.style.color = '#4ade80';
+  }, 'image/jpeg', 0.92);
+}
+
+startCamBtn && startCamBtn.addEventListener('click', startCamera);
+stopCamBtn && stopCamBtn.addEventListener('click', () => {
+  stopCamera();
+  statusEl && (statusEl.textContent = 'Camera stopped');
+  statusEl.style.color = '#a9b3c1';
+});
+captureBtn && captureBtn.addEventListener('click', captureFrame);
 
 uploadForm.addEventListener('submit', async (e) => {
   e.preventDefault();

@@ -1,68 +1,789 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Facial Insights</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Facial Insights PRO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --secondary: #a855f7;
+      --accent: #ec4899;
+      --dark: #0f172a;
+      --light: #f8fafc;
+      --glass: rgba(15, 23, 42, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--dark);
+      color: var(--light);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    /* Glassmorphism Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    /* Action Buttons Container */
+    .action-container {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      animation: fadeInDown 1s ease;
+    }
+
+    /* Upload Section */
+    .upload-area {
+      flex: 1;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-area:hover {
+      border-color: var(--primary);
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.25);
+    }
+
+    .upload-area.dragover {
+      border-color: var(--accent);
+      background: rgba(236, 72, 153, 0.1);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: transform 0.3s ease;
+    }
+
+    .upload-area:hover .upload-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .upload-text h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .upload-text p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* Camera Button Area (Same style as upload for symmetry) */
+    .camera-btn-area {
+      flex: 1;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .camera-btn-area:hover {
+      border-color: var(--accent);
+      transform: translateY(-5px);
+      box-shadow: 0 25px 50px -12px rgba(236, 72, 153, 0.25);
+    }
+
+    .camera-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: transform 0.3s ease;
+    }
+
+    .camera-btn-area:hover .camera-icon {
+      transform: scale(1.1) rotate(-5deg);
+    }
+
+
+    /* Results Grid */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+    }
+
+    .results-grid.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Image Preview */
+    .preview-card {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .image-wrapper {
+      width: 100%;
+      height: 400px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #previewImg {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .face-box {
+      position: absolute;
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .face-box:hover {
+      border-color: var(--light);
+      z-index: 10;
+    }
+
+    .face-label {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    /* Analysis Panel */
+    .analysis-card {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 2rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.5rem;
+      border-radius: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    .stat-item:hover {
+      transform: scale(1.02);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    /* Progress Bars (Emotions) */
+    .emotion-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .emotion-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .bar-container {
+      flex: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Camera Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .camera-modal {
+      background: var(--dark);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 1.5rem;
+      max-width: 90%;
+      width: 640px;
+      position: relative;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .video-container {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+      aspect-ratio: 4/3;
+    }
+
+    #webcam {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      /* Mirror effect */
+    }
+
+    .camera-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      padding: 0.75rem 2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.1s;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--light);
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    /* Loading Overlay */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .loader.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--accent);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .action-container {
+        flex-direction: column;
+      }
+
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image-wrapper {
+        height: 300px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <div class="app-shell">
-    <header class="glass header">
-      <div class="brand">🎭 AI Facial Insights</div>
-      <div class="api-config">
-        <label for="apiUrl">API URL (optional)</label>
-        <input id="apiUrl" type="text" placeholder="Using Render.com (default)" />
-        <button id="saveApi" class="btn">Save</button>
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Camera Modal -->
+  <div class="modal-overlay" id="cameraModal">
+    <div class="camera-modal">
+      <button class="close-modal" onclick="closeCamera()">&times;</button>
+      <div class="video-container">
+        <video id="webcam" autoplay playsinline></video>
+      </div>
+      <div class="camera-controls">
+        <button class="btn btn-secondary" onclick="closeCamera()">Cancel</button>
+        <button class="btn btn-primary" onclick="captureImage()">
+          <i class="fas fa-camera"></i> Capture
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="logo">
+        <i class="fas fa-brain"></i> Facial Insights PRO
+      </div>
+      <div style="color: #94a3b8; font-size: 0.9rem;">
+        <i class="fab fa-python"></i> PyTorch Powered
       </div>
     </header>
 
-    <main class="content-grid">
-      <section class="glass panel upload">
-        <h2>📸 Upload Photo</h2>
-        <div class="info-banner" style="background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.4); color: #86efac;">
-          ✅ <strong>Ready to use!</strong> Backend is live on Render.com. <em>Note: First request may take 30-60s (free tier wakeup).</em>
+    <div class="action-container">
+      <!-- Upload Box -->
+      <div class="upload-area" id="dropZone">
+        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+        <div class="upload-text">
+          <h3>Upload Image</h3>
+          <p>Drag & drop or browse</p>
+          <p style="font-size: 0.8rem; margin-top: 0.5rem; color: #64748b;">JPG, PNG (Max 10MB)</p>
         </div>
-        <form id="uploadForm" class="upload-form">
-          <input type="file" id="imageInput" accept="image/*" />
-          <button type="submit" class="btn primary">Analyze</button>
-        </form>
-        <div class="preview-wrap">
-          <img id="preview" alt="preview" />
-        </div>
-        <div id="status" class="status"></div>
-      </section>
+        <input type="file" id="fileInput" accept="image/*">
+      </div>
 
-      <section class="glass panel results">
-        <h2> Results</h2>
-        <div class="cards">
-          <div class="card"><div class="label">Age</div><div id="ageVal" class="value">—</div><div id="ageBand" class="subvalue">—</div></div>
-          <div class="card"><div class="label">Gender</div><div id="genderVal" class="value">—</div></div>
-          <div class="card"><div class="label">Dominant Emotion</div><div id="emotionVal" class="value">—</div></div>
-          <div class="card"><div class="label">Dominant Race</div><div id="raceVal" class="value">—</div></div>
+      <!-- Camera Button -->
+      <div class="camera-btn-area" onclick="openCamera()">
+        <i class="fas fa-camera-retro camera-icon"></i>
+        <div class="upload-text">
+          <h3>Use Camera</h3>
+          <p>Take a selfie</p>
+          <p style="font-size: 0.8rem; margin-top: 0.5rem; color: #64748b;">Instant Analysis</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-grid" id="resultsSection">
+      <!-- Left: Image -->
+      <div class="preview-card">
+        <div class="image-wrapper" id="imgWrapper">
+          <img id="previewImg" src="" alt="Preview">
+          <!-- Boxes will be injected here -->
+        </div>
+        <div style="margin-top: 1rem; text-align: center; color: #94a3b8; font-size: 0.9rem;">
+          <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
+          <span id="processTime">Processed in 0.00s</span>
+        </div>
+      </div>
+
+      <!-- Right: Analysis -->
+      <div class="analysis-card">
+        <div class="card-header">
+          <h2 id="faceTitle">Analysis Results</h2>
+          <span
+            style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
+            Live Inference
+          </span>
         </div>
 
-        <div class="charts">
-          <div class="chart glass"><h3>Emotion Breakdown</h3><pre id="emotionJson" class="json">Upload an image to see results</pre></div>
-          <div class="chart glass"><h3>Race Breakdown</h3><pre id="raceJson" class="json">Upload an image to see results</pre></div>
-        </div>
-      </section>
-    </main>
+        <div id="statsContainer">
+          <div class="stat-grid">
+            <div class="stat-item">
+              <div class="stat-label"><i class="fas fa-user-clock"></i> Est. Age</div>
+              <div class="stat-value" id="resAge">--</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label"><i class="fas fa-venus-mars"></i> Gender</div>
+              <div class="stat-value" id="resGender">--</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label"><i class="fas fa-globe"></i> Race</div>
+              <div class="stat-value" id="resRace">--</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label"><i class="fas fa-star"></i> Quality</div>
+              <div class="stat-value" id="resQuality">--</div>
+            </div>
+          </div>
 
-    <footer class="glass footer">
-      <div> <strong>Local testing:</strong> Run backend with <code>python -m uvicorn backend.main_deepface:app --host 0.0.0.0 --port 8001</code>, then use API: <code>http://localhost:8001</code></div>
-      <div> <strong>Production:</strong> Deploy backend to Render/Railway/Azure and enter the URL above.</div>
-    </footer>
+          <h4 style="margin-bottom: 1rem; color: #94a3b8;">Confidence Scores</h4>
+          <div class="emotion-list" id="confidenceList">
+            <!-- Bars injected via JS -->
+          </div>
+        </div>
+
+        <div id="emptyState" style="text-align: center; color: #64748b; padding: 2rem;">
+          Select a detected face to view details
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="loader" class="loader hidden">
-    <div class="spinner"></div>
-    <div>Analyzing with DeepFace models</div>
-  </div>
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const loader = document.getElementById('loader');
+    const resultsSection = document.getElementById('resultsSection');
+    const previewImg = document.getElementById('previewImg');
+    const imgWrapper = document.getElementById('imgWrapper');
+    const cameraModal = document.getElementById('cameraModal');
+    const video = document.getElementById('webcam');
 
-  <script src="script.js"></script>
+    let stream = null;
+    let currentData = null;
+
+    // --- Drag & Drop & File Upload ---
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+    // --- Camera Logic ---
+    async function openCamera() {
+      cameraModal.classList.add('active');
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (err) {
+        alert("Could not access camera: " + err.message);
+        closeCamera();
+      }
+    }
+
+    function closeCamera() {
+      cameraModal.classList.remove('active');
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+    }
+
+    function captureImage() {
+      if (!stream) return;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+
+      // Horizontal flip if needed (since preview is mirrored)
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0);
+
+      canvas.toBlob((blob) => {
+        const file = new File([blob], "webcam_capture.jpg", { type: "image/jpeg" });
+        handleFile(file);
+        closeCamera();
+      }, 'image/jpeg');
+    }
+
+    // --- Main Logic ---
+    async function handleFile(file) {
+      if (!file) return;
+
+      // Show UI Preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImg.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      // Upload
+      const formData = new FormData();
+      formData.append('file', file);
+
+      loader.classList.add('active');
+
+      try {
+        const response = await fetch('http://127.0.0.1:8001/predict', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          currentData = data;
+          renderResults(data);
+          resultsSection.classList.add('visible');
+        } else {
+          alert('Error: ' + JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Connection Failed. Is the backend running?');
+      } finally {
+        loader.classList.remove('active');
+      }
+    }
+
+    function renderResults(data) {
+      // Clear boxes
+      document.querySelectorAll('.face-box').forEach(e => e.remove());
+
+      document.getElementById('processTime').innerText = `Processed in ${data.processing_time_ms}ms`;
+
+      // Need actual image dimensions to scale boxes
+      const naturalWidth = data.metadata.image_dimensions.width;
+      const naturalHeight = data.metadata.image_dimensions.height;
+
+      // Calculate scale
+      // The image is object-fit: contain, so we need to calculate the displayed size
+      const wrapperRect = imgWrapper.getBoundingClientRect();
+
+      // Calculate ratio based on "contain" logic
+      const ratio = Math.min(wrapperRect.width / naturalWidth, wrapperRect.height / naturalHeight);
+
+      const displayWidth = naturalWidth * ratio;
+      const displayHeight = naturalHeight * ratio;
+
+      const offsetX = (wrapperRect.width - displayWidth) / 2;
+      const offsetY = (wrapperRect.height - displayHeight) / 2;
+
+      data.faces.forEach((face, index) => {
+        const box = document.createElement('div');
+        box.className = 'face-box';
+
+        // Scale coordinates
+        box.style.left = `${offsetX + (face.face_location.x * ratio)}px`;
+        box.style.top = `${offsetY + (face.face_location.y * ratio)}px`;
+        box.style.width = `${face.face_location.w * ratio}px`;
+        box.style.height = `${face.face_location.h * ratio}px`;
+
+        // Label
+        const label = document.createElement('div');
+        label.className = 'face-label';
+        label.innerText = `${face.gender}, ${face.age}`;
+        box.appendChild(label);
+
+        // Interaction
+        box.onclick = () => showFaceDetails(index);
+
+        imgWrapper.appendChild(box);
+
+        // Select first face by default
+        if (index === 0) showFaceDetails(0);
+      });
+
+      if (data.faces.length === 0) {
+        alert("No faces detected!");
+      }
+    }
+
+    function showFaceDetails(index) {
+      const face = currentData.faces[index];
+      const container = document.getElementById('statsContainer');
+      const empty = document.getElementById('emptyState');
+
+      container.style.display = 'block';
+      empty.style.display = 'none';
+
+      // Text Stats
+      document.getElementById('faceTitle').innerText = `Face #${index + 1}`;
+      document.getElementById('resAge').innerText = face.age;
+      document.getElementById('resGender').innerText = face.gender;
+      document.getElementById('resRace').innerText = face.dominant_race;
+      document.getElementById('resQuality').innerText = face.quality.score + '%';
+
+      // Confidence Bars
+      const list = document.getElementById('confidenceList');
+      list.innerHTML = '';
+
+      const items = [
+        { label: 'Gender Conf.', val: face.gender_confidence, color: '#ec4899' },
+        { label: 'Race Conf.', val: Math.max(...Object.values(face.race_scores)), color: '#a855f7' },
+        { label: 'Emotion (Neutral)', val: face.emotion_scores.neutral, color: '#6366f1' }
+      ];
+
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'emotion-item';
+        div.innerHTML = `
+                    <span style="width: 100px; font-size: 0.9rem; color: #cbd5e1;">${item.label}</span>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: ${item.val}%; background: ${item.color}"></div>
+                    </div>
+                    <span style="font-size: 0.8rem; width: 40px; text-align: right;">${Math.round(item.val)}%</span>
+                `;
+        list.appendChild(div);
+      });
+    }
+  </script>
 </body>
+
 </html>
