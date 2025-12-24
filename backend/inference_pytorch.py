@@ -5,6 +5,7 @@ from torchvision import models, transforms
 from facenet_pytorch import MTCNN
 from PIL import Image
 import numpy as np
+import cv2
 import os
 
 # Re-defining the architecture here to be self-contained for deployment
@@ -120,11 +121,11 @@ class FacialPredictor:
                 
             x1, y1, x2, y2 = [int(b) for b in box]
 
-            # Add 20% margin for context
+            # Add 30% margin for context
             w = x2 - x1
             h = y2 - y1
-            margin_w = int(w * 0.2)
-            margin_h = int(h * 0.2)
+            margin_w = int(w * 0.0)
+            margin_h = int(h * 0.0)
             
             x1 = max(0, x1 - margin_w)
             y1 = max(0, y1 - margin_h)
@@ -133,6 +134,10 @@ class FacialPredictor:
             
             # Crop face
             face_img = image.crop((x1, y1, x2, y2))
+
+            # Enhancement: CLAHE removed to match training data distribution
+            if face_img.mode != 'RGB':
+                face_img = face_img.convert('RGB')
             
             if face_img.size[0] < 20 or face_img.size[1] < 20:
                 continue

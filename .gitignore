@@ -1,44 +1,28 @@
-﻿
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
-# Virtual Environment
+# Virtual Environments
 .venv/
+.venv311/
+env/
 venv/
 ENV/
 
-# Model Weights (too large for git usually, unless using LFS)
-models/
-!models/.gitkeep
-*.pth
-*.h5
-
-# Datasets
-datasets/
-
-# IDEs
+# VS Code
 .vscode/
-.idea/
 
-# Artifacts
-debug_inference.py
+# Datasets & Models
+datasets/
+models/
+data_collection/__pycache__/
+backend/__pycache__/
+tests/__pycache__/
+
+# Tools
+ngrok.exe
+
+# OS
+.DS_Store
+Thumbs.db
